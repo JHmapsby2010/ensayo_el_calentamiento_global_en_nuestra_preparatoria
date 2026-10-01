@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El problema de calor en nuestra preparatoria</title>
+    <style>
+        /* ===== RESET Y VARIABLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --color-primario: #1e3a5f;
+            --color-secundario: #2c5282;
+            --color-acento: #e53e3e;
+            --color-acento-suave: #fed7d7;
+            --color-fondo: #f7fafc;
+            --color-texto: #2d3748;
+            --color-texto-claro: #718096;
+            --color-blanco: #ffffff;
+            --sombra: 0 4px 6px rgba(0, 0, 0, 0.07), 0 1px 3px rgba(0, 0, 0, 0.06);
+            --sombra-hover: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+            --radio: 12px;
+            --transicion: all 0.3s ease;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--color-fondo);
+            color: var(--color-texto);
+            line-height: 1.7;
+            font-size: 16px;
+        }
+
+        /* ===== HEADER / HERO ===== */
+        .hero {
+            background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-secundario) 100%);
+            color: var(--color-blanco);
+            padding: 100px 20px 80px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
+            background-size: 30px 30px;
+            animation: moverFondo 20s linear infinite;
+        }
+
+        @keyframes moverFondo {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(30px, 30px); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero .linea-decorativa {
+            width: 60px;
+            height: 4px;
+            background: var(--color-acento);
+            margin: 0 auto 25px;
+            border-radius: 2px;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            letter-spacing: -0.5px;
+        }
+
+        .hero p {
+            font-size: 1.15rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* ===== NAVEGACIÓN ===== */
+        .nav {
+            background: var(--color-blanco);
+            box-shadow: var(--sombra);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 0 20px;
+        }
+
+        .nav ul {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            list-style: none;
+            max-width: 900px;
+            margin: 0 auto;
+            gap: 5px;
+        }
+
+        .nav ul li a {
+            display: block;
+            padding: 16px 18px;
+            color: var(--color-texto-claro);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            border-bottom: 3px solid transparent;
+            transition: var(--transicion);
+        }
+
+        .nav ul li a:hover {
+            color: var(--color-primario);
+            border-bottom-color: var(--color-acento);
+        }
+
+        /* ===== CONTENEDOR PRINCIPAL ===== */
+        .contenedor {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 50px 20px 80px;
+        }
+
+        /* ===== SECCIONES ===== */
+        .seccion {
+            margin-bottom: 60px;
+            animation: aparecer 0.6s ease forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .seccion.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @keyframes aparecer {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .seccion-titulo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.6rem;
+            color: var(--color-primario);
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 3px solid var(--color-acento-suave);
+        }
+
+        .seccion-titulo .marca {
+            width: 6px;
+            height: 28px;
+            background: var(--color-acento);
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+
+        .seccion p {
+            margin-bottom: 16px;
+            text-align: justify;
+            color: var(--color-texto);
+        }
+
+        /* ===== TARJETAS DE MATERIALES ===== */
+        .grid-materiales {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+
+        .tarjeta-material {
+            background: var(--color-blanco);
+            border-radius: var(--radio);
+            padding: 25px 20px;
+            box-shadow: var(--sombra);
+            transition: var(--transicion);
+            border-left: 4px solid var(--color-acento);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tarjeta-material::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 50px;
+            height: 50px;
+            background: var(--color-acento-suave);
+            border-radius: 0 0 0 50px;
+            opacity: 0.5;
+        }
+
+        .tarjeta-material:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--sombra-hover);
+        }
+
+        .tarjeta-material .numero {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--color-acento);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            display: block;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tarjeta-material h3 {
+            font-size: 1.1rem;
+            color: var(--color-primario);
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tarjeta-material p {
+            font-size: 0.9rem;
+            color: var(--color-texto-claro);
+            margin: 0;
+            text-align: left;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== LISTA DE CONSECUENCIAS ===== */
+        .lista-consecuencias {
+            list-style: none;
+            margin: 20px 0;
+        }
+
+        .lista-consecuencias li {
+            background: var(--color-blanco);
+            padding: 16px 20px 16px 55px;
+            margin-bottom: 12px;
+            border-radius: var(--radio);
+            box-shadow: var(--sombra);
+            position: relative;
+            transition: var(--transicion);
+            font-size: 0.95rem;
+        }
+
+        .lista-consecuencias li::before {
+            content: '';
+            position: absolute;
+            left: 22px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 8px;
+            background: var(--color-acento);
+            border-radius: 50%;
+            box-shadow: 0 0 0 4px var(--color-acento-suave);
+        }
+
+        .lista-consecuencias li:hover {
+            transform: translateX(5px);
+            box-shadow: var(--sombra-hover);
+        }
+
+        .lista-consecuencias li strong {
+            color: var(--color-primario);
+        }
+
+        /* ===== CAJA DE SOLUCIONES ===== */
+        .caja-soluciones {
+            background: linear-gradient(135deg, #ebf8ff 0%, #e6fffa 100%);
+            border-radius: var(--radio);
+            padding: 30px;
+            border: 1px solid #bee3f8;
+            margin-top: 20px;
+        }
+
+        .caja-soluciones h3 {
+            color: var(--color-secundario);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .caja-soluciones ul {
+            list-style: none;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 12px;
+        }
+
+        .caja-soluciones ul li {
+            padding: 12px 15px;
+            background: var(--color-blanco);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: var(--transicion);
+        }
+
+        .caja-soluciones ul li:hover {
+            transform: scale(1.02);
+            box-shadow: var(--sombra);
+        }
+
+        .caja-soluciones ul li .check {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #38a169;
+            border-radius: 50%;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .caja-soluciones ul li .check::after {
+            content: '';
+            position: absolute;
+            left: 4px;
+            top: 1px;
+            width: 5px;
+            height: 9px;
+            border: solid #38a169;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        /* ===== CONCLUSIÓN ===== */
+        .conclusion {
+            background: linear-gradient(135deg, var(--color-primario) 0%, var(--color-secundario) 100%);
+            color: var(--color-blanco);
+            border-radius: var(--radio);
+            padding: 40px 35px;
+            text-align: center;
+            box-shadow: var(--sombra-hover);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .conclusion::before {
+            content: '';
+            position: absolute;
+            top: -60px;
+            right: -60px;
+            width: 180px;
+            height: 180px;
+            border: 3px solid rgba(255,255,255,0.08);
+            border-radius: 50%;
+        }
+
+        .conclusion::after {
+            content: '';
+            position: absolute;
+            bottom: -40px;
+            left: -40px;
+            width: 120px;
+            height: 120px;
+            border: 3px solid rgba(255,255,255,0.06);
+            border-radius: 50%;
+        }
+
+        .conclusion h2 {
+            font-size: 1.6rem;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .conclusion p {
+            font-size: 1.05rem;
+            opacity: 0.95;
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            text-align: center;
+            padding: 30px 20px;
+            color: var(--color-texto-claro);
+            font-size: 0.85rem;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 40px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 600px) {
+            .hero {
+                padding: 70px 20px 50px;
+            }
+            .hero h1 {
+                font-size: 1.7rem;
+            }
+            .hero p {
+                font-size: 1rem;
+            }
+            .nav ul li a {
+                padding: 12px 10px;
+                font-size: 0.8rem;
+            }
+            .seccion-titulo {
+                font-size: 1.3rem;
+            }
+            .contenedor {
+                padding: 30px 15px 50px;
+            }
+            .conclusion {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== HERO ===== -->
+    <header class="hero">
+        <div class="hero-content">
+            <div class="linea-decorativa"></div>
+            <h1>El problema de calor en nuestra preparatoria</h1>
+            <p>Un análisis sobre las causas, consecuencias y posibles soluciones para mejorar nuestro ambiente escolar.</p>
+        </div>
+    </header>
+
+    <!-- ===== NAVEGACIÓN ===== -->
+    <nav class="nav">
+        <ul>
+            <li><a href="#introduccion">Introducción</a></li>
+            <li><a href="#causas">Causas</a></li>
+            <li><a href="#consecuencias">Consecuencias</a></li>
+            <li><a href="#aprendizaje">Aprendizaje</a></li>
+            <li><a href="#soluciones">Soluciones</a></li>
+            <li><a href="#conclusion">Conclusión</a></li>
+        </ul>
+    </nav>
+
+    <!-- ===== CONTENIDO PRINCIPAL ===== -->
+    <main class="contenedor">
+
+        <!-- INTRODUCCIÓN -->
+        <section id="introduccion" class="seccion">
+            <h2 class="seccion-titulo"><span class="marca"></span> Introducción</h2>
+            <p>Nuestra problemática es el calor que hace en la preparatoria, ya que los estudiantes necesitamos contar con un ambiente adecuado para poder desarrollar nuestras actividades de la mejor manera posible. Las altas temperaturas pueden hacer que algunos estudiantes se sientan incómodos, generar cansancio y dificultar la concentración durante las clases.</p>
+            <p>Por ello, es importante analizar las causas de esta problemática, sus consecuencias y las posibles soluciones que podrían implementarse dentro de la comunidad estudiantil. De esta manera, podríamos mejorar las condiciones de la preparatoria y crear un ambiente más cómodo y adecuado para realizar nuestras actividades y desarrollar nuestras habilidades.</p>
+        </section>
+
+        <!-- CAUSAS -->
+        <section id="causas" class="seccion">
+            <h2 class="seccion-titulo"><span class="marca"></span> Causas del exceso de calor</h2>
+            <p>Una de las causas por las cuales hace tanto calor en la preparatoria es la época del año, ya que nos encontramos en una temporada en la que las temperaturas pueden aumentar. A esto se suma la poca ventilación que hay en todos los salones. Aunque contamos con varias ventanas, no siempre existe suficiente circulación de aire, lo que puede provocar que el aire caliente permanezca dentro del salón y aumente la sensación de calor durante las clases.</p>
+            <p>Otro factor que puede influir es la presencia de materiales que absorben o retienen el calor. Algunos de los materiales que podemos encontrar en las instalaciones son:</p>
+
+            <div class="grid-materiales">
+                <div class="tarjeta-material">
+                    <span class="numero">Material 01</span>
+                    <h3>Ladrillo</h3>
+                    <p>Puede calentarse al estar expuesto a la radiación solar y conservar parte de ese calor durante cierto tiempo, haciendo que los muros permanezcan calientes incluso después de que dejan de recibir directamente el sol.</p>
+                </div>
+                <div class="tarjeta-material">
+                    <span class="numero">Material 02</span>
+                    <h3>Asfalto</h3>
+                    <p>Absorbe una cantidad importante de radiación solar y puede alcanzar temperaturas elevadas. Por esta razón, los patios, caminos o zonas asfaltadas pueden contribuir al aumento de la temperatura en los espacios cercanos.</p>
+                </div>
+                <div class="tarjeta-material">
+                    <span class="numero">Material 03</span>
+                    <h3>Tablaroca</h3>
+                    <p>Puede calentarse cuando recibe radiación solar, aunque su influencia depende principalmente de factores como el material que se encuentra detrás, el aislamiento y la exposición directa al sol.</p>
+                </div>
+            </div>
+
+            <p>Además, la falta de sistemas para regular la temperatura también puede influir en el exceso de calor dentro de los salones. La falta de ventiladores o de aires acondicionados hace que sea más difícil mantener una temperatura agradable y que no todos los estudiantes reciban una circulación de aire adecuada.</p>
+            <p>A su vez, la falta de protección contra el sol, como cortinas, persianas o protectores solares, permite que la radiación solar entre directamente a los salones durante las clases. Aunque en las palapas de la preparatoria contamos con toldos, los salones no cuentan con este tipo de protección, por lo que reciben directamente la luz solar en determinados momentos del día.</p>
+            <p>Finalmente, la ubicación de la preparatoria, al encontrarse cerca de zonas de cerros, sería otro factor que podríamos considerar. La forma del terreno puede influir en la circulación del aire en determinadas condiciones, por lo que sería importante observar si existen zonas de la escuela donde el aire circula menos y el calor permanece durante más tiempo.</p>
+        </section>
+
+        <!-- CONSECUENCIAS -->
+        <section id="consecuencias" class="seccion">
+            <h2 class="seccion-titulo"><span class="marca"></span> Consecuencias del calor en estudiantes y profesores</h2>
+            <p>El calor que implica el calentamiento global en la escuela es insufrible en algunas ocasiones, además de que nos afecta en más de un aspecto referente al estudio:</p>
+
+            <ul class="lista-consecuencias">
+                <li><strong>Cansancio y fatiga:</strong> el cuerpo tiene que trabajar más para regular la temperatura óptima, lo que provoca más fatiga y sueño al momento de las clases.</li>
+                <li><strong>Distracción y dificultad para prestar atención:</strong> las altas temperaturas dificultan la concentración durante las clases.</li>
+                <li><strong>Malestares físicos:</strong> estar mucho tiempo en el calor, ya sea en el salón o en las canchas, nos puede causar dolores de cabeza, malestar y sensación de agotamiento.</li>
+                <li><strong>Disminución del aprendizaje:</strong> al estar deshidratado o incómodo, el aprendizaje óptimo disminuye.</li>
+                <li><strong>Irritabilidad y estrés en profesores:</strong> pueden presentar más irritabilidad y estrés al momento de impartir clase, lo que puede dificultar el mantener un espacio tranquilo.</li>
+                <li><strong>Olores incómodos:</strong> la mayoría de las veces no es solo el calor insufrible, también es el olor que los alumnos pueden llegar a tener después de actividad física.</li>
+            </ul>
+        </section>
+
+        <!-- IMPACTO EN EL APRENDIZAJE -->
+        <section id="aprendizaje" class="seccion">
+            <h2 class="seccion-titulo"><span class="marca"></span> Impacto en el aprendizaje</h2>
+            <p>El calor excesivo en las aulas tiene un impacto directo y negativo en el proceso de aprendizaje. Cuando los estudiantes están incómodos, sudando o con sed, su atención se desvía de la clase hacia su propio malestar. Esto reduce la capacidad de retener información, participar activamente y mantener la concentración durante períodos prolongados.</p>
+            <p>Además, el agotamiento físico provocado por el calor hace que el cerebro reciba menos oxígeno y que el cuerpo priorice funciones vitales sobre las cognitivas. Como resultado, los estudiantes se sienten más somnolientos, les cuesta seguir el ritmo de la clase y su rendimiento académico puede verse afectado negativamente.</p>
+        </section>
+
+        <!-- SOLUCIONES -->
+        <section id="soluciones" class="seccion">
+            <h2 class="seccion-titulo"><span class="marca"></span> Posibles soluciones</h2>
+            <p>Para mejorar esta situación, se proponen las siguientes acciones que la comunidad estudiantil y las autoridades escolares podrían implementar:</p>
+
+            <div class="caja-soluciones">
+                <h3>Acciones sugeridas</h3>
+                <ul>
+                    <li><span class="check"></span> Instalar ventiladores o sistemas de aire acondicionado en los salones.</li>
+                    <li><span class="check"></span> Colocar cortinas, persianas o protectores solares en las ventanas.</li>
+                    <li><span class="check"></span> Mejorar la ventilación cruzada abriendo ventanas en lados opuestos.</li>
+                    <li><span class="check"></span> Plantar árboles o crear áreas verdes que den sombra.</li>
+                    <li><span class="check"></span> Usar materiales aislantes o pintura reflectante en muros y techos.</li>
+                    <li><span class="check"></span> Establecer horarios de clase que eviten las horas de mayor radiación solar.</li>
+                    <li><span class="check"></span> Promover el consumo frecuente de agua entre los estudiantes.</li>
+                    <li><span class="check"></span> Crear conciencia sobre el cuidado del ambiente y el cambio climático.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- CONCLUSIÓN -->
+        <section id="conclusion" class="seccion">
+            <div class="conclusion">
+                <h2>Conclusión</h2>
+                <p>El calor afecta mucho en la escuela porque hace que nos cansemos y no pongamos tanta atención. Si los salones estuvieran más frescos, sería más fácil concentrarnos y aprender mejor. Mejorar las condiciones del ambiente escolar no solo beneficia nuestro rendimiento académico, sino también nuestra salud y bienestar general. Es responsabilidad de todos contribuir a crear un espacio más cómodo y adecuado para aprender.</p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ===== FOOTER ===== -->
+    <footer>
+        <p>Ensayo elaborado por la comunidad estudiantil · Preparatoria · 2025</p>
+    </footer>
+
+    <!-- ===== JAVASCRIPT: Animación al hacer scroll ===== -->
+    <script>
+        // Animación de aparición para las secciones
+        const secciones = document.querySelectorAll('.seccion');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        });
+
+        secciones.forEach(seccion => observer.observe(seccion));
+
+        // Resaltar enlace activo en la navegación
+        const enlaces = document.querySelectorAll('.nav ul li a');
+        const seccionesConId = document.querySelectorAll('section[id]');
+
+        window.addEventListener('scroll', () => {
+            let actual = '';
+            seccionesConId.forEach(seccion => {
+                const top = seccion.offsetTop - 100;
+                if (window.scrollY >= top) {
+                    actual = seccion.getAttribute('id');
+                }
+            });
+
+            enlaces.forEach(enlace => {
+                enlace.style.color = '';
+                enlace.style.borderBottomColor = '';
+                if (enlace.getAttribute('href') === '#' + actual) {
+                    enlace.style.color = 'var(--color-primario)';
+                    enlace.style.borderBottomColor = 'var(--color-acento)';
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
